@@ -4,10 +4,31 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <title>Api-App</title>
+    <!-- Alpine.js -->
+    <script defer src="//unpkg.com/alpinejs"></script>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+
   </head>
+
   <body>
-    <div id="app"></div>
+    <div x-data=" {open: false}">
+      <!-- NavBar -->
+       <nav class="border border-slate-600 shadow-md p-4">
+        <div class=" text-2xl font-extrabold text-slate-900">
+          SwiftCraft
+          <!-- Toggle Bar -->
+           <button @click="open = !open" class="lg:hidden text-white focus:outline-none bg-slate-700">
+            
+
+           </button>
+        </div>
+
+       </nav>
+    </div>
+
     <script type="module" src="/main.js"></script>
   </body>
 </html>
