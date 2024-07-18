@@ -5,6 +5,8 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Api-App</title>
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Alpine.js -->
     <script defer src="//unpkg.com/alpinejs"></script>
     <!-- Tailwind CSS -->
@@ -16,17 +18,29 @@
   <body>
     <div x-data=" {open: false}">
       <!-- NavBar -->
-       <nav class="border border-slate-600 shadow-md p-4">
+       <nav class="border border-slate-600 shadow-md p-4 flex justify-between  ">
         <div class=" text-2xl font-extrabold text-slate-900">
           SwiftCraft
-          <!-- Toggle Bar -->
-           <button @click="open = !open" class="lg:hidden text-white focus:outline-none bg-slate-700">
-            
-
-           </button>
         </div>
+        <div class="">
+          <a href="#" class="text-lg font-semibold">WishList</a>
+          <i class="fas fa-shopping-cart"></i>
+          <a href="#" class="text-lg font-semibold">LogIn</a>
+         </div>
+          <!-- Toggle Bar -->
+           <div>
+           <button @click="open = !open" class="lg:hidden text-black focus:outline-none bg-slate-700 ">
+            <i class="fas fa-bars text-2xl"></i>
+           </button>
+          </div>
+
+        
 
        </nav>
+       <!-- Toggle Menu -->
+        <div x-show="open" @click.away="open = false" class="lg:hidden fixed inset-0 bg-slate-800">
+
+        </div>
     </div>
 
     <script type="module" src="/main.js"></script>
