@@ -16,7 +16,6 @@
 <body>
     <div x-data="productApp()" x-init="init()">
 
-        
         <!-- NavBar -->
         <nav class="border border-slate-600 shadow-md p-4 flex justify-between">
             <div class="text-2xl font-extrabold text-slate-900">
@@ -27,14 +26,17 @@
                 <i class="fas fa-shopping-cart"></i>
                 <a href="#" class="text-lg font-semibold">LogIn</a>
             </div>
+
             <!-- Toggle Bar -->
             <div>
                 <button @click="open = !open" class="lg:hidden text-black focus:outline-none bg-slate-700 p-2 rounded">
                     <i class="fas fa-bars text-2xl"></i>
                 </button>
             </div>
-            <!-- Toggle Menu -->
-        <div x-show="open" @click.away="open = false" class="lg:hidden fixed inset-0 px-4 py-12">
+        </nav>
+
+         <!-- Toggle Menu -->
+         <div x-show="open" @click.away="open = false" class="lg:hidden fixed inset-0 px-4 py-12">
             <!-- Menu content here -->
              <div class="flex flex-col border border-slate-600 shadow-md; ">
               <a href="#" class="text-lg font-semibold">WishList</a>
@@ -44,7 +46,6 @@
              </div>
 
         </div>
-        </nav>
         
 
         <!-- Product Grid -->
@@ -67,7 +68,133 @@
         </div>
     </div>
 
-    <script type="module" src="/main.js"></script>
+    <script>
+        function productApp() {
+            return {
+                open: false,
+                modalOpen: false,
+                products: [],
+                singleProduct:{},
+                categories: [],
+                selectedCategory: '',
+                sortorder: 'asc',
+                loading: true,
+                search: '',
+                cart: [],
+                cartCount: 0,
+                total: 0,
+
+                // Fetching products from api
+                init() {
+                    this.fetchProducts();
+                    this.fetchCategories();
+                },
+
+                fetchAllProducts() {
+                    this.loading = true;
+                    let url = 'https://fakestoreapi.com/products';
+                    if (this.selectedCategory) {
+                        url += `/category/${this.selectedCategory}`;
+                    }
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.products = data;
+                            this.sortProducts();
+                            this.loading = false;
+                        });
+                },
+
+                fetchSingleProduct(productId) {
+                    this.loading = true;
+                    fetch(`https://fakestoreapi.com/products/1`)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.singleProduct = data;
+                            this.loading = false;
+                            this.modalOpen = true;
+                        });
+                },
+
+                fetchSortResults() {
+                    this.loading = true;
+                    fetch(`https://fakestoreapi.com/products?sort=desc`)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.products = data;
+                        this.sortProducts();
+                        this.loading = false;
+                        });
+
+                    if (this.sortOrder === 'asc') {
+                        this.products.sort((a, b) => a.price - b.price);
+                    } else {
+                        this.products.sort((a, b) => b.price - a.price);
+                    }
+                },
+
+                fetchAllCategories() {
+                    this.loading = true;
+                    fetch(`https://fakestoreapi.com/products/categories`)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.categories = data;
+                        this.loading = false;
+                        });
+                        },
+                        sortProducts() {
+                            if (this.sortOrder === 'asc') {
+                                this.products.sort((a, b) => a.price - b.price);
+                                } else {
+                                    this.products.sort((a, b) => b.price - a.price);
+                                    }
+                                    },
+
+                fetchProductsByCategory() {
+                    this.loading = true;
+                    fetch(`https://fakestoreapi.com/products/category/jewelery`)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.products = data;
+                        this.loading = false;
+                        });
+                        },
+
+                addProduct() {
+                    const newProduct = {
+                        title: "New Product",
+                        price: 19.99,
+                        description: "This is a new product",
+                        image: "https://via.placeholder.com/150",
+                        category: "electronics"
+                    }; 
+                    fetch('https://fakestoreapi.com/products', {
+                        method: 'POST',
+                        body: JSON.stringify(newProduct),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        this.products.push(data);
+                        this.sortProducts();
+                    });     
+                }     
+            }          
+
+        
+
+                }
+
+                
+
+
+
+            
+            
+        
+    </script>
 </body>
 </html>
 
