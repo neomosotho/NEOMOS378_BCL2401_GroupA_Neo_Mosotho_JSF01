@@ -11,6 +11,11 @@
     <script defer src="//unpkg.com/alpinejs"></script>
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .star {
+            color: #ffc107;
+        }
+    </style>
 </head>
 
 <body>
@@ -27,7 +32,7 @@
             </div>
             <!-- Toggle Bar -->
             <div>
-                <button @click="open = !open" class="lg:hidden text-black focus:outline-none bg-slate-700 p-2 rounded">
+                <button @click="open = !open" class="lg:hidden text-black focus:outline-none bg-slate-700 p-2 rounded" aria-label="Toggle menu">
                     <i class="fas fa-bars text-2xl"></i>
                 </button>
             </div>
@@ -50,20 +55,20 @@
                 <select id="category" x-model="selectedCategory" @change="fetchProducts">
                     <option value="">All</option>
                     <template x-for="category in categories" :key="category">
-                        <option x-text="category"></option>
+                        <option :value="category" x-text="category"></option>
                     </template>
                 </select>
             </div>
             <div>
                 <label for="sort" class="mr-2">Sort by:</label>
                 <select id="sort" x-model="sortOrder" @change="sortProducts">
-                    <option value="All">Default</option>
+                    <option value="Default">Default</option>
                     <option value="asc">Price: Low to High</option>
                     <option value="desc">Price: High to Low</option>
                 </select>
             </div>
             <div>
-                <button @click="addProduct()" class="bg-blue-500 text-white px-4 py-2 rounded">Add New Product</button>
+                <button @click="addProduct" class="bg-blue-500 text-white px-4 py-2 rounded">Add New Product</button>
             </div>
         </div>
 
@@ -75,11 +80,17 @@
             <div x-show="!loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <template x-for="product in products" :key="product.id">
                     <div class="bg-white rounded-lg shadow-md p-4">
-                        <img :src="product.image" alt="Product Image" class="w-full h-48 object-cover">
+                        <img :src="product.image" alt="Product Image" class="w-400px h-48 object-cover">
                         <div class="mt-4">
                             <h2 class="text-lg font-bold text-gray-800" x-text="product.title"></h2>
                             <p class="text-gray-600" x-text="'$' + product.price"></p>
                             <p class="text-gray-600" x-text="'Category: ' + product.category"></p>
+                            <div class="flex items-center">
+                                <template x-for="star in 5" :key="star">
+                                    <i :class="{'star fas fa-star': star <= Math.round(product.rating.rate), 'far fa-star': star > Math.round(product.rating.rate)}"></i>
+                                </template>
+                                <span class="ml-2 text-gray-600" x-text="`(${product.rating.count} reviews)`"></span>
+                            </div>
                             <button @click="fetchSingleProduct(product.id)" class="mt-2 text-blue-500">View Details</button>
                         </div>
                     </div>
@@ -93,6 +104,12 @@
                 <h2 class="text-2xl font-bold mb-4" x-text="singleProduct.title"></h2>
                 <img :src="singleProduct.image" alt="Product Image" class="w-full h-48 object-cover mb-4">
                 <p class="text-gray-600 mb-4" x-text="'$' + singleProduct.price"></p>
+                <div class="flex items-center mb-4">
+                    <template x-for="star in 5" :key="star">
+                        <i :class="{'star fas fa-star': star <= Math.round(singleProduct.rating.rate), 'far fa-star': star > Math.round(singleProduct.rating.rate)}"></i>
+                    </template>
+                    <span class="ml-2 text-gray-600" x-text="`(${singleProduct.rating.count} reviews)`"></span>
+                </div>
                 <p class="text-gray-600 mb-4" x-text="singleProduct.description"></p>
                 <p class="text-gray-600 mb-4" x-text="'Category: ' + singleProduct.category"></p>
                 <button @click="modalOpen = false" class="bg-red-500 text-white p-2 rounded">Close</button>
@@ -160,31 +177,14 @@
                 },
 
                 addProduct() {
-                    const newProduct = {
-                        title: "New Product",
-                        price: 13.5,
-                        description: "This is a new product",
-                        image: "https://via.placeholder.com/150",
-                        category: "electronics"
-                    };
-
-                    fetch('https://fakestoreapi.com/products', {
-                        method: 'POST',
-                        body: JSON.stringify(newProduct),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        this.products.push(data);
-                        this.sortProducts();
-                    });
+                    // Define your add product functionality here
+                    alert("Add new product functionality is not implemented yet.");
                 }
             }
         }
     </script>
 </body>
 </html>
+
 
 
