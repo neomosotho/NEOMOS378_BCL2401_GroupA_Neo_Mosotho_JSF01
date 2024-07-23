@@ -15,7 +15,6 @@
 
 <body>
     <div x-data="productApp()" x-init="init()">
-
         <!-- NavBar -->
         <nav class="border border-slate-600 shadow-md p-4 flex justify-between">
             <div class="text-2xl font-extrabold text-slate-900">
@@ -26,7 +25,6 @@
                 <i class="fas fa-shopping-cart"></i>
                 <a href="#" class="text-lg font-semibold">LogIn</a>
             </div>
-
             <!-- Toggle Bar -->
             <div>
                 <button @click="open = !open" class="lg:hidden text-black focus:outline-none bg-slate-700 p-2 rounded">
@@ -35,18 +33,39 @@
             </div>
         </nav>
 
-         <!-- Toggle Menu -->
-         <div x-show="open" @click.away="open = false" class="lg:hidden fixed inset-0 px-4 py-12">
+        <!-- Toggle Menu -->
+        <div x-show="open" @click.away="open = false" class="lg:hidden fixed inset-0 px-4 py-12 bg-white shadow-md">
             <!-- Menu content here -->
-             <div class="flex flex-col border border-slate-600 shadow-md; ">
-              <a href="#" class="text-lg font-semibold">WishList</a>
-              <i class="fas fa-shopping-cart"></i>
-              <a href="#" class="text-lg font-semibold">LogIn</a>
-
-             </div>
-
+            <div class="flex flex-col border border-slate-600 shadow-md p-4">
+                <a href="#" class="text-lg font-semibold">WishList</a>
+                <i class="fas fa-shopping-cart"></i>
+                <a href="#" class="text-lg font-semibold">LogIn</a>
+            </div>
         </div>
-        
+
+        <!-- Sorting and Filtering -->
+        <div class="container mx-auto p-4 flex justify-between items-center">
+            <div>
+                <label for="category" class="mr-2">Category:</label>
+                <select id="category" x-model="selectedCategory" @change="fetchProducts">
+                    <option value="">All</option>
+                    <template x-for="category in categories" :key="category">
+                        <option x-text="category"></option>
+                    </template>
+                </select>
+            </div>
+            <div>
+                <label for="sort" class="mr-2">Sort by:</label>
+                <select id="sort" x-model="sortOrder" @change="sortProducts">
+                    <option value="All">Default</option>
+                    <option value="asc">Price: Low to High</option>
+                    <option value="desc">Price: High to Low</option>
+                </select>
+            </div>
+            <div>
+                <button @click="addProduct()" class="bg-blue-500 text-white px-4 py-2 rounded">Add New Product</button>
+            </div>
+        </div>
 
         <!-- Product Grid -->
         <div class="container mx-auto p-4">
@@ -61,9 +80,22 @@
                             <h2 class="text-lg font-bold text-gray-800" x-text="product.title"></h2>
                             <p class="text-gray-600" x-text="'$' + product.price"></p>
                             <p class="text-gray-600" x-text="'Category: ' + product.category"></p>
+                            <button @click="fetchSingleProduct(product.id)" class="mt-2 text-blue-500">View Details</button>
                         </div>
                     </div>
                 </template>
+            </div>
+        </div>
+
+        <!-- Single Product Modal -->
+        <div x-show="modalOpen" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
+            <div class="bg-white p-8 rounded-lg shadow-lg max-w-md mx-auto">
+                <h2 class="text-2xl font-bold mb-4" x-text="singleProduct.title"></h2>
+                <img :src="singleProduct.image" alt="Product Image" class="w-full h-48 object-cover mb-4">
+                <p class="text-gray-600 mb-4" x-text="'$' + singleProduct.price"></p>
+                <p class="text-gray-600 mb-4" x-text="singleProduct.description"></p>
+                <p class="text-gray-600 mb-4" x-text="'Category: ' + singleProduct.category"></p>
+                <button @click="modalOpen = false" class="bg-red-500 text-white p-2 rounded">Close</button>
             </div>
         </div>
     </div>
@@ -74,23 +106,26 @@
                 open: false,
                 modalOpen: false,
                 products: [],
-                singleProduct:{},
+                singleProduct: {},
                 categories: [],
                 selectedCategory: '',
-                sortorder: 'asc',
+                sortOrder: 'asc',
                 loading: true,
-                search: '',
-                cart: [],
-                cartCount: 0,
-                total: 0,
 
-                // Fetching products from api
                 init() {
-                    this.fetchProducts();
                     this.fetchCategories();
+                    this.fetchProducts();
                 },
 
-                fetchAllProducts() {
+                fetchCategories() {
+                    fetch('https://fakestoreapi.com/products/categories')
+                        .then(response => response.json())
+                        .then(data => {
+                            this.categories = data;
+                        });
+                },
+
+                fetchProducts() {
                     this.loading = true;
                     let url = 'https://fakestoreapi.com/products';
                     if (this.selectedCategory) {
@@ -107,7 +142,7 @@
 
                 fetchSingleProduct(productId) {
                     this.loading = true;
-                    fetch(`https://fakestoreapi.com/products/1`)
+                    fetch(`https://fakestoreapi.com/products/${productId}`)
                         .then(response => response.json())
                         .then(data => {
                             this.singleProduct = data;
@@ -116,16 +151,7 @@
                         });
                 },
 
-                fetchSortResults() {
-                    this.loading = true;
-                    fetch(`https://fakestoreapi.com/products?sort=desc`)
-                    .then(response => response.json())
-                    .then(data => {
-                        this.products = data;
-                        this.sortProducts();
-                        this.loading = false;
-                        });
-
+                sortProducts() {
                     if (this.sortOrder === 'asc') {
                         this.products.sort((a, b) => a.price - b.price);
                     } else {
@@ -133,41 +159,15 @@
                     }
                 },
 
-                fetchAllCategories() {
-                    this.loading = true;
-                    fetch(`https://fakestoreapi.com/products/categories`)
-                    .then(response => response.json())
-                    .then(data => {
-                        this.categories = data;
-                        this.loading = false;
-                        });
-                        },
-                        sortProducts() {
-                            if (this.sortOrder === 'asc') {
-                                this.products.sort((a, b) => a.price - b.price);
-                                } else {
-                                    this.products.sort((a, b) => b.price - a.price);
-                                    }
-                                    },
-
-                fetchProductsByCategory() {
-                    this.loading = true;
-                    fetch(`https://fakestoreapi.com/products/category/jewelery`)
-                    .then(response => response.json())
-                    .then(data => {
-                        this.products = data;
-                        this.loading = false;
-                        });
-                        },
-
                 addProduct() {
                     const newProduct = {
                         title: "New Product",
-                        price: 19.99,
+                        price: 13.5,
                         description: "This is a new product",
                         image: "https://via.placeholder.com/150",
                         category: "electronics"
-                    }; 
+                    };
+
                     fetch('https://fakestoreapi.com/products', {
                         method: 'POST',
                         body: JSON.stringify(newProduct),
@@ -179,22 +179,12 @@
                     .then(data => {
                         this.products.push(data);
                         this.sortProducts();
-                    });     
-                }     
-            }          
-
-        
-
+                    });
                 }
-
-                
-
-
-
-            
-            
-        
+            }
+        }
     </script>
 </body>
 </html>
+
 
